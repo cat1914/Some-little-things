@@ -1,0 +1,21 @@
+
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;resources&gt;
+    &lt;string name="app_name"&gt;骁龙录屏&lt;/string&gt;
+    &lt;string name="start_record"&gt;开始录制&lt;/string&gt;
+    &lt;string name="stop_record"&gt;停止录制&lt;/string&gt;
+    &lt;string name="record_microphone"&gt;录制麦克风&lt;/string&gt;
+    &lt;string name="record_system_audio"&gt;录制系统声音&lt;/string&gt;
+    &lt;string name="notification_channel_name"&gt;录屏服务&lt;/string&gt;
+    &lt;string name="notification_channel_description"&gt;屏幕录制通知&lt;/string&gt;
+    &lt;string name="notification_title"&gt;正在录制&lt;/string&gt;
+    &lt;string name="notification_text"&gt;点击停止录制&lt;/string&gt;
+    &lt;string name="permission_denied"&gt;权限被拒绝&lt;/string&gt;
+    &lt;string name="recording_started"&gt;录制已开始&lt;/string&gt;
+    &lt;string name="recording_stopped"&gt;录制已停止，保存至：%1$s&lt;/string&gt;
+    &lt;string name="video_quality"&gt;视频质量&lt;/string&gt;
+    &lt;string name="resolution_1080p"&gt;1080p&lt;/string&gt;
+    &lt;string name="resolution_720p"&gt;720p&lt;/string&gt;
+    &lt;string name="bitrate"&gt;码率&lt;/string&gt;
+&lt;/resources&gt;
+
