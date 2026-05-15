@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity() {
         isRecording = true
         updateUI()
         Toast.makeText(this, R.string.recording_started, Toast.LENGTH_SHORT).show()
-        finish()
+        moveTaskToBack(true)
     }
 
     private fun stopRecording() {
