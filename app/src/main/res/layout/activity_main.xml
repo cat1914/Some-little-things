@@ -1,13 +1,12 @@
-
-&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"&gt;
+    tools:context=".MainActivity">
 
-    &lt;TextView
+    <TextView
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,9 +16,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="32dp" /&gt;
+        android:layout_marginTop="32dp" />
 
-    &lt;LinearLayout
+    <LinearLayout
         android:id="@+id/audioSettings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,25 +27,25 @@
         app:layout_constraintTop_toBottomOf="@id/titleText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginHorizontal="24dp"&gt;
+        android:layout_marginHorizontal="24dp">
 
-        &lt;com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/microphoneSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/record_microphone"
-            android:layout_marginVertical="8dp" /&gt;
+            android:layout_marginVertical="8dp" />
 
-        &lt;com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/systemAudioSwitch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/record_system_audio"
-            android:layout_marginVertical="8dp" /&gt;
+            android:layout_marginVertical="8dp" />
 
-    &lt;/LinearLayout&gt;
+    </LinearLayout>
 
-    &lt;LinearLayout
+    <LinearLayout
         android:id="@+id/qualitySettings"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -55,41 +54,41 @@
         app:layout_constraintTop_toBottomOf="@id/audioSettings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginHorizontal="24dp"&gt;
+        android:layout_marginHorizontal="24dp">
 
-        &lt;TextView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/video_quality"
-            android:textSize="16sp" /&gt;
+            android:textSize="16sp" />
 
-        &lt;RadioGroup
+        <RadioGroup
             android:id="@+id/resolutionGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"&gt;
+            android:layout_marginTop="8dp">
 
-            &lt;com.google.android.material.radiobutton.MaterialRadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/resolution1080p"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/resolution_1080p"
-                android:checked="true" /&gt;
+                android:checked="true" />
 
-            &lt;com.google.android.material.radiobutton.MaterialRadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/resolution720p"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/resolution_720p" /&gt;
+                android:text="@string/resolution_720p" />
 
-        &lt;/RadioGroup&gt;
+        </RadioGroup>
 
-    &lt;/LinearLayout&gt;
+    </LinearLayout>
 
-    &lt;com.google.android.material.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/startButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -100,7 +99,6 @@
         android:layout_marginTop="48dp"
         android:layout_marginHorizontal="24dp"
         android:textSize="18sp"
-        android:paddingVertical="12dp" /&gt;
+        android:paddingVertical="12dp" />
 
-&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;
-
+</androidx.constraintlayout.widget.ConstraintLayout>

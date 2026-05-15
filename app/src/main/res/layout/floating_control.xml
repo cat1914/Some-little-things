@@ -1,46 +1,44 @@
-
-&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/floating_background"
     android:padding="12dp"
-    android:elevation="8dp"&gt;
+    android:elevation="8dp">
 
-    &lt;TextView
+    <TextView
         android:id="@+id/statusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="录制中"
         android:textColor="@android:color/white"
         android:textSize="14sp"
-        android:layout_gravity="center_horizontal" /&gt;
+        android:layout_gravity="center_horizontal" />
 
-    &lt;LinearLayout
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"&gt;
+        android:layout_marginTop="8dp">
 
-        &lt;ImageButton
+        <ImageButton
             android:id="@+id/stopButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@android:drawable/ic_media_pause"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="停止" /&gt;
+            android:contentDescription="停止" />
 
-        &lt;ImageButton
+        <ImageButton
             android:id="@+id/minimizeButton"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_marginStart="8dp"
-            android:contentDescription="最小化" /&gt;
+            android:contentDescription="最小化" />
 
-    &lt;/LinearLayout&gt;
+    </LinearLayout>
 
-&lt;/LinearLayout&gt;
-
+</LinearLayout>
