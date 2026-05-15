@@ -1,4 +1,3 @@
-
 package com.snapdragon.screenrecorder
 
 import android.app.Notification
@@ -23,7 +22,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import android.provider.MediaStore
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -33,7 +31,6 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import android.media.MediaMuxer
 import java.io.File
-import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -75,13 +72,15 @@ class ScreenRecordService : Service() {
     private var audioTrackIndex = -1
     private var muxerStarted = false
     private val muxerLock = Any()
+    private var videoThread: Thread? = null
+    private var audioThread: Thread? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
-            ACTION_START -&gt; startRecording(intent)
-            ACTION_STOP -&gt; stopRecording()
+            ACTION_START -> startRecording(intent)
+            ACTION_STOP -> stopRecording()
         }
         return START_STICKY
     }
@@ -90,7 +89,7 @@ class ScreenRecordService : Service() {
         if (isRecording.get()) return
 
         val resultCode = intent.getIntExtra(EXTRA_RESULT_CODE, 0)
-        val data = intent.getParcelableExtra&lt;Intent&gt;(EXTRA_DATA)
+        val data = intent.getParcelableExtra<Intent>(EXTRA_DATA)
         recordMicrophone = intent.getBooleanExtra(EXTRA_RECORD_MICROPHONE, false)
         recordSystemAudio = intent.getBooleanExtra(EXTRA_RECORD_SYSTEM_AUDIO, false)
         val is1080p = intent.getBooleanExtra(EXTRA_IS_1080P, true)
@@ -102,9 +101,9 @@ class ScreenRecordService : Service() {
         startForeground(NOTIFICATION_ID, createNotification())
 
         val (width, height, bitRate) = if (is1080p) {
-            Triple(1920, 1080, 8_000_000)
+            Triple(1920, 1080, 8000000)
         } else {
-            Triple(1280, 720, 4_000_000)
+            Triple(1280, 720, 4000000)
         }
 
         try {
@@ -114,7 +113,7 @@ class ScreenRecordService : Service() {
             }
             createOutputFile()
             setupFloatingView()
-            
+
             isRecording.set(true)
             startVideoEncoding()
             if (recordMicrophone || recordSystemAudio) {
@@ -132,7 +131,7 @@ class ScreenRecordService : Service() {
         format.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
         format.setInteger(MediaFormat.KEY_FRAME_RATE, VIDEO_FRAME_RATE)
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, VIDEO_I_FRAME_INTERVAL)
-        
+
         format.setInteger(MediaFormat.KEY_BITRATE_MODE, MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR)
 
         videoEncoder = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
@@ -162,7 +161,7 @@ class ScreenRecordService : Service() {
     private fun createOutputFile() {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "ScreenRecord_$timestamp.mp4"
-        
+
         val moviesDir = getExternalFilesDir(null)
         val outputFile = File(moviesDir, fileName)
         videoOutputPath = outputFile.absolutePath
@@ -177,7 +176,7 @@ class ScreenRecordService : Service() {
 
                 while (isRecording.get()) {
                     val outputBufferIndex = videoEncoder!!.dequeueOutputBuffer(bufferInfo, 10000)
-                    if (outputBufferIndex &gt;= 0) {
+                    if (outputBufferIndex >= 0) {
                         val encodedData = videoEncoder!!.getOutputBuffer(outputBufferIndex)
                         if (encodedData != null) {
                             if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
@@ -188,9 +187,9 @@ class ScreenRecordService : Service() {
                                         checkStartMuxer()
                                     }
                                 }
-                            } else if (bufferInfo.size &gt; 0) {
+                            } else if (bufferInfo.size > 0) {
                                 synchronized(muxerLock) {
-                                    if (muxerStarted &amp;&amp; videoTrackIndex &gt;= 0) {
+                                    if (muxerStarted && videoTrackIndex >= 0) {
                                         mediaMuxer!!.writeSampleData(videoTrackIndex, encodedData, bufferInfo)
                                     }
                                 }
@@ -222,7 +221,7 @@ class ScreenRecordService : Service() {
             )
         }
 
-        if (recordSystemAudio &amp;&amp; Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.Q) {
+        if (recordSystemAudio && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val audioAttributes = AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -247,7 +246,7 @@ class ScreenRecordService : Service() {
         audioThread = Thread {
             try {
                 audioEncoder!!.start()
-                
+
                 audioRecord?.startRecording()
                 systemAudioRecord?.startRecording()
 
@@ -257,20 +256,20 @@ class ScreenRecordService : Service() {
 
                 while (isRecording.get()) {
                     var totalRead = 0
-                    
+
                     if (recordMicrophone) {
                         val micRead = audioRecord!!.read(buffer, totalRead, buffer.size - totalRead)
-                        if (micRead &gt; 0) totalRead += micRead
-                    }
-                    
-                    if (recordSystemAudio &amp;&amp; Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.Q) {
-                        val systemRead = systemAudioRecord!!.read(buffer, totalRead, buffer.size - totalRead)
-                        if (systemRead &gt; 0) totalRead += systemRead
+                        if (micRead > 0) totalRead += micRead
                     }
 
-                    if (totalRead &gt; 0) {
+                    if (recordSystemAudio && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        val systemRead = systemAudioRecord!!.read(buffer, totalRead, buffer.size - totalRead)
+                        if (systemRead > 0) totalRead += systemRead
+                    }
+
+                    if (totalRead > 0) {
                         val inputBufferIndex = audioEncoder!!.dequeueInputBuffer(10000)
-                        if (inputBufferIndex &gt;= 0) {
+                        if (inputBufferIndex >= 0) {
                             val inputBuffer = audioEncoder!!.getInputBuffer(inputBufferIndex)
                             inputBuffer?.put(buffer, 0, totalRead)
                             audioEncoder!!.queueInputBuffer(inputBufferIndex, 0, totalRead, presentationTimeUs, 0)
@@ -279,7 +278,7 @@ class ScreenRecordService : Service() {
                     }
 
                     var outputBufferIndex = audioEncoder!!.dequeueOutputBuffer(bufferInfo, 10000)
-                    while (outputBufferIndex &gt;= 0) {
+                    while (outputBufferIndex >= 0) {
                         val encodedData = audioEncoder!!.getOutputBuffer(outputBufferIndex)
                         if (encodedData != null) {
                             if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
@@ -290,9 +289,9 @@ class ScreenRecordService : Service() {
                                         checkStartMuxer()
                                     }
                                 }
-                            } else if (bufferInfo.size &gt; 0) {
+                            } else if (bufferInfo.size > 0) {
                                 synchronized(muxerLock) {
-                                    if (muxerStarted &amp;&amp; audioTrackIndex &gt;= 0) {
+                                    if (muxerStarted && audioTrackIndex >= 0) {
                                         mediaMuxer!!.writeSampleData(audioTrackIndex, encodedData, bufferInfo)
                                     }
                                 }
@@ -309,11 +308,11 @@ class ScreenRecordService : Service() {
     }
 
     private fun checkStartMuxer() {
-        val hasVideo = videoTrackIndex &gt;= 0
-        val hasAudio = (recordMicrophone || recordSystemAudio) &amp;&amp; audioTrackIndex &gt;= 0
+        val hasVideo = videoTrackIndex >= 0
+        val hasAudio = (recordMicrophone || recordSystemAudio) && audioTrackIndex >= 0
         val needsAudio = recordMicrophone || recordSystemAudio
-        
-        if (hasVideo &amp;&amp; (!needsAudio || hasAudio)) {
+
+        if (hasVideo && (!needsAudio || hasAudio)) {
             if (!muxerStarted) {
                 mediaMuxer!!.start()
                 muxerStarted = true
@@ -328,7 +327,7 @@ class ScreenRecordService : Service() {
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
-            if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             } else {
                 @Suppress("DEPRECATION")
@@ -342,11 +341,11 @@ class ScreenRecordService : Service() {
         params.x = 100
         params.y = 100
 
-        floatingView?.findViewById&lt;View&gt;(R.id.stopButton)?.setOnClickListener {
+        floatingView?.findViewById<View>(R.id.stopButton)?.setOnClickListener {
             stopRecording()
         }
 
-        floatingView?.findViewById&lt;View&gt;(R.id.minimizeButton)?.setOnClickListener {
+        floatingView?.findViewById<View>(R.id.minimizeButton)?.setOnClickListener {
             removeFloatingView()
         }
 
@@ -355,22 +354,22 @@ class ScreenRecordService : Service() {
         var initialTouchX = 0f
         var initialTouchY = 0f
 
-        floatingView?.setOnTouchListener { _, event -&gt;
+        floatingView?.setOnTouchListener { _, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN -&gt; {
+                MotionEvent.ACTION_DOWN -> {
                     initialX = params.x
                     initialY = params.y
                     initialTouchX = event.rawX
                     initialTouchY = event.rawY
                     true
                 }
-                MotionEvent.ACTION_MOVE -&gt; {
+                MotionEvent.ACTION_MOVE -> {
                     params.x = initialX + (event.rawX - initialTouchX).toInt()
                     params.y = initialY + (event.rawY - initialTouchY).toInt()
                     windowManager?.updateViewLayout(floatingView, params)
                     true
                 }
-                else -&gt; false
+                else -> false
             }
         }
 
@@ -386,12 +385,12 @@ class ScreenRecordService : Service() {
 
     private fun stopRecording() {
         if (!isRecording.get()) return
-        
+
         isRecording.set(false)
-        
+
         videoThread?.join()
         audioThread?.join()
-        
+
         try {
             videoEncoder?.stop()
             videoEncoder?.release()
@@ -401,7 +400,7 @@ class ScreenRecordService : Service() {
             audioRecord?.release()
             systemAudioRecord?.stop()
             systemAudioRecord?.release()
-            
+
             synchronized(muxerLock) {
                 if (muxerStarted) {
                     mediaMuxer?.stop()
@@ -409,7 +408,7 @@ class ScreenRecordService : Service() {
                 }
                 mediaMuxer?.release()
             }
-            
+
             mediaProjection?.stop()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -425,7 +424,7 @@ class ScreenRecordService : Service() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 getString(R.string.notification_channel_name),
@@ -457,4 +456,3 @@ class ScreenRecordService : Service() {
             .build()
     }
 }
-

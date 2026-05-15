@@ -1,4 +1,3 @@
-
 package com.snapdragon.screenrecorder
 
 import android.Manifest
@@ -21,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
     private val mediaProjectionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
-    ) { result -&gt;
+    ) { result ->
         if (result.resultCode == RESULT_OK) {
             startRecording(result.resultCode, result.data)
         } else {
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions -&gt;
+    ) { permissions ->
         val allGranted = permissions.values.all { it }
         if (allGranted) {
             requestMediaProjection()
@@ -61,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        val permissionsToRequest = mutableListOf&lt;String&gt;()
+        val permissionsToRequest = mutableListOf<String>()
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity() {
             permissionsToRequest.add(Manifest.permission.RECORD_AUDIO)
         }
 
-        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
             ) {
@@ -110,7 +109,7 @@ class MainActivity : AppCompatActivity() {
             putExtra(ScreenRecordService.EXTRA_IS_1080P, is1080p)
         }
 
-        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent)
         } else {
             startService(intent)
@@ -135,4 +134,3 @@ class MainActivity : AppCompatActivity() {
         binding.startButton.text = if (isRecording) getString(R.string.stop_record) else getString(R.string.start_record)
     }
 }
-
